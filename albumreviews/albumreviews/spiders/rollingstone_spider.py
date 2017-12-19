@@ -1,6 +1,6 @@
 import scrapy
 import dateparser
-from albumreview.util import sanitize
+from albumreviews.util import sanitize
 
 class RollingStoneSpider(scrapy.Spider):
     name = "rollingstone"

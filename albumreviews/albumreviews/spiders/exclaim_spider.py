@@ -1,6 +1,6 @@
 import scrapy
 import dateparser
-from albumreview.util import sanitize
+from albumreviews.util import sanitize
 import re
 
 class ExclaimSpider(scrapy.Spider):
@@ -33,6 +33,7 @@ class ExclaimSpider(scrapy.Spider):
         if rating != "":
             review = re.split('(\n[0-9]\n)', review)[2]
         review = re.split('(\([^()]+\)\n\n)', review)[0]
+        review = sanitize(review)
 
         yield {
             "date": date.strftime("%Y-%m-%d"),
