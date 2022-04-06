@@ -5,15 +5,15 @@ from albumreviews.util import sanitize
 class RollingStoneSpider(scrapy.Spider):
     name = "rollingstone"
     start_urls = [
-        'http://www.rollingstone.com/music/albumreviews',
+        'https://www.rollingstone.com/music/albumreviews',
     ]
 
     def parse(self, response):
         """Pull URLs to reviews"""
-        for review in response.css('a.content-card-link'):
+        for review in response.css('a.c-card__wrap::attr(href)').getall():
             yield response.follow(review, callback=self.parse_review)
            
-        next_page = response.css('a.load-more::attr(href)').extract_first()
+        next_page = response.css('div.c-pagination.a::attr(href)').get()
         if next_page is not None:
             # will automatically extract href attribute and works with relative urls
             yield response.follow(next_page, callback=self.parse)
@@ -21,31 +21,28 @@ class RollingStoneSpider(scrapy.Spider):
     def parse_review(self, response):
         """Pull data from individual review pages"""
         date = dateparser.parse(
-            response.css("time.content-published-date::text").extract_first(default="1900-01-01")
+            response.css("time::attr(datetime)").get(default="1900-01-01")
         )
+        stars = [star.attrib["xlink:href"] for star in response.css("svg.c-rating__star--active>use")]
+        if any("half" in star for star in stars):
+            rating = len(stars) - 1.5
+        else:
+            rating = len(stars) - 1
 
-        author = response.css("a.content-author::text").extract_first(default="Not Found").strip()
-
-        title = response.css("h1.content-title::text").extract_first(default="Not Found")
-
-        if title.startswith("Review:"):
-            title = title.lstrip("Review:")
-        artist, album = title.strip(), ""
-        
+        author = response.css("a.c-byline__link::text").get(default="null").strip()
+        title = response.css("h1.l-article-header__row::text").get(default="null").strip()
+        artists = response.css("a.c-tags__item::text").getall()
         review = sanitize(" ".join(
-            response.css("div.article-content p::text").extract()
+            response.css("div.pmc-paywall>p::text").getall()
         ))
 
-        stars = response.css("span.percentage.full").extract()
-        half_stars = response.css("span.percentage.half").extract()
-        rating = len(stars) + (len(half_stars) * 0.5)
 
         yield {
             "date": date.strftime("%Y-%m-%d"),
             "author": author,
             "rating": rating,
-            "artist": artist,
-            "album": album,
+            "artist": artists,
+            "title": title,
             "review": review,
         }
     

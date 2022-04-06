@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    image: scrapyalbumreviews
+    volumes:
+      - .:/home/app_user/
+    stdin_open: true
+    tty: true

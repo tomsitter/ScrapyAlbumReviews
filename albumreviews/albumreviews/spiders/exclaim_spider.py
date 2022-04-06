@@ -6,7 +6,7 @@ import re
 class ExclaimSpider(scrapy.Spider):
     name = "exclaim"
     start_urls = [
-        'http://exclaim.ca/music/reviews',
+        'https://exclaim.ca/music/reviews',
     ]
 
     def parse(self, response):
