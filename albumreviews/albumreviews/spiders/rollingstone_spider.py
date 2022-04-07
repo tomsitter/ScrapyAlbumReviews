@@ -4,6 +4,7 @@ from albumreviews.util import sanitize
 
 class RollingStoneSpider(scrapy.Spider):
     name = "rollingstone"
+    allowed_domains = ['rollingstone.com']
     start_urls = [
         'https://www.rollingstone.com/music/albumreviews',
     ]
@@ -33,14 +34,9 @@ class RollingStoneSpider(scrapy.Spider):
         title = response.css("h1.l-article-header__row::text").get(default="null").strip()
         tags = response.css("a.c-tags__item::text").getall()
         review = sanitize(" ".join(
-            response.css("div.pmc-paywall>p::text").getall()
+            response.css("div.pmc-paywall>p ::text").getall()
         ))
-        # some reviews texts are located within spans, so if the above query didn't work, try this
-        if not review:
-            review = sanitize(" ".join(
-                response.css("div.pmc-paywall>p>span::text").getall()
-            ))
-
+    
         yield {
             "date": date.strftime("%Y-%m-%d"),
             "author": author,

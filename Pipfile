@@ -9,7 +9,6 @@ dateparser = "*"
 
 [dev-packages]
 bpython = "*"
-windows-curses = {version = "*", sys_platform = "== 'win32'"}
 
 [requires]
 python_version = "3.9"

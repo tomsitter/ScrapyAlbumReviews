@@ -5,6 +5,7 @@ import re
 
 class ExclaimSpider(scrapy.Spider):
     name = "exclaim"
+    allowed_domains = ['exclaim.ca']
     start_urls = [
         'https://exclaim.ca/all/album',
     ]
@@ -13,7 +14,6 @@ class ExclaimSpider(scrapy.Spider):
         for review in response.css('li.streamItem>article>a::attr(href)'):
             yield response.follow(review, callback=self.parse_review)
            
-        # next_page_url = next_page(response.url)
         next_page = response.css('div.pull-right>strong>a::attr(href)').get()
         if next_page is not None:
             # will automatically extract href attribute and works with relative urls
@@ -55,13 +55,3 @@ class ExclaimSpider(scrapy.Spider):
             "review": review,
             "url": response.url
         }
-    
-
-def next_page(url):
-    """Given a URL for a page of album reviews, return the next page"""
-    current_page = re.search('page/(\d+)$', url)
-    if not current_page:
-        return url + '/page/2'
-    page_number = current_page.groups()[0]
-    page_digits = len(page_number)
-    return url[:-page_digits] + str(int(page_number) + 1)
