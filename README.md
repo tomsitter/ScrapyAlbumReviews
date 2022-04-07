@@ -29,4 +29,4 @@ With Docker:
 > scrapy crawl exclaim -o exclaim_reviews.csv
 ```
 
-Produces a CSV with the following contents: date, author, rating, tags, title, and review text, and URL
+Produces a CSV with the following contents: date, author, rating, tags, title, review text, and review URL
