@@ -10,10 +10,10 @@ class RollingStoneSpider(scrapy.Spider):
 
     def parse(self, response):
         """Pull URLs to reviews"""
-        for review in response.css('a.c-card__wrap::attr(href)').getall():
+        for review in response.css('li.l-river__item>article.c-card>a.c-card__wrap::attr(href)').getall():
             yield response.follow(review, callback=self.parse_review)
            
-        next_page = response.css('div.c-pagination.a::attr(href)').get()
+        next_page = response.css('a.c-pagination__btn--right::attr(href)').get()
         if next_page is not None:
             # will automatically extract href attribute and works with relative urls
             yield response.follow(next_page, callback=self.parse)
@@ -27,22 +27,27 @@ class RollingStoneSpider(scrapy.Spider):
         if any("half" in star for star in stars):
             rating = len(stars) - 1.5
         else:
-            rating = len(stars) - 1
+            rating = len(stars)
 
         author = response.css("a.c-byline__link::text").get(default="null").strip()
         title = response.css("h1.l-article-header__row::text").get(default="null").strip()
-        artists = response.css("a.c-tags__item::text").getall()
+        tags = response.css("a.c-tags__item::text").getall()
         review = sanitize(" ".join(
             response.css("div.pmc-paywall>p::text").getall()
         ))
-
+        # some reviews texts are located within spans, so if the above query didn't work, try this
+        if not review:
+            review = sanitize(" ".join(
+                response.css("div.pmc-paywall>p>span::text").getall()
+            ))
 
         yield {
             "date": date.strftime("%Y-%m-%d"),
             "author": author,
             "rating": rating,
-            "artist": artists,
+            "tags": tags,
             "title": title,
             "review": review,
+            "url": response.url,
         }
     
