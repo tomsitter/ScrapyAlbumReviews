@@ -4,11 +4,17 @@ Album Review parser from Exclaim and Rollingstone using Scrapy
 
 ## Install dependencies
 
-Dependencies and virtualenv managed with pipenv
+With pip
+```
+> python3 -m venv .venv
+> pip install -r requirements.txt
 
 ```
-> pip install pipenv
-> pipenv --install
+
+Wih pipenv
+
+```
+> pipenv install
 > pipenv shell
 ```
 or with Docker:
@@ -16,9 +22,9 @@ or with Docker:
 > docker compose run albumreviews
 ```
 
-
 ## Running
 ```
+> cd albumreviews
 > scrapy crawl rollingstone -o rs_reviews.csv
 > scrapy crawl exclaim -o exclaim_reviews.csv
 ```
