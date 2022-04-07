@@ -6,9 +6,11 @@ name = "pypi"
 [packages]
 scrapy = ">=2.6.1"
 dateparser = "*"
+twisted = ">=22.4.0rc1"
 
 [dev-packages]
 bpython = "*"
+twisted = ">=22.4.0rc1"
 
 [requires]
 python_version = "3.9"
